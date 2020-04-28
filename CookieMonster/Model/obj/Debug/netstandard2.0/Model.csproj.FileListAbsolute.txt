@@ -1,0 +1,9 @@
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/obj/Debug/netstandard2.0/Model.csprojAssemblyReference.cache
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/obj/Debug/netstandard2.0/Model.csproj.CoreCompileInputs.cache
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/obj/Debug/netstandard2.0/Model.AssemblyInfoInputs.cache
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/obj/Debug/netstandard2.0/Model.AssemblyInfo.cs
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/bin/Debug/netstandard2.0/Model.deps.json
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/bin/Debug/netstandard2.0/Model.dll
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/bin/Debug/netstandard2.0/Model.pdb
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/obj/Debug/netstandard2.0/Model.dll
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/obj/Debug/netstandard2.0/Model.pdb

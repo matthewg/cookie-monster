@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "epV/lECHaGKrtpu+JheBeLkv3l75O61EsIShBobsrku8jq+XlCsZbw7vW1R0t1TE/T8L/ZDVO5RgLNl7Q9HqFQ==",
+  "success": true,
+  "projectFilePath": "/home/matthewgiffordsachs/cookie-monster/CookieMonster/Model/Model.csproj",
+  "expectedPackageFiles": [
+    "/home/matthewgiffordsachs/.nuget/packages/microsoft.netcore.platforms/1.1.0/microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "/home/matthewgiffordsachs/.nuget/packages/netstandard.library/2.0.3/netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

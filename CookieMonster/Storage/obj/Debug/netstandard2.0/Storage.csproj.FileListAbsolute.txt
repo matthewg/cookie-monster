@@ -1,0 +1,4 @@
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Storage/obj/Debug/netstandard2.0/Storage.csprojAssemblyReference.cache
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Storage/obj/Debug/netstandard2.0/Storage.csproj.CoreCompileInputs.cache
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Storage/obj/Debug/netstandard2.0/Storage.AssemblyInfoInputs.cache
+/home/matthewgiffordsachs/cookie-monster/CookieMonster/Storage/obj/Debug/netstandard2.0/Storage.AssemblyInfo.cs
