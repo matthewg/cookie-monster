@@ -11,6 +11,7 @@ enum MoneyType {
 }
 
 struct Transaction {
+    readonly uint64 Id;
     readonly DateTime Time;
     readonly List<Item> Items;
     readonly string Note;
