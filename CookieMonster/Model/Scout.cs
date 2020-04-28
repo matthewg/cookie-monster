@@ -1,10 +1,11 @@
 namespace CookieMonster.Model {
-    public class Scout : ValueStore {
-        public Scout(ulong id, string name, string digitalCookieUrl)
-          : base(ValueStoreType.Scout, id, name){
+    public class Scout {
+        public Scout(ValueStore valueStore, string digitalCookieUrl) {
+            this.ValueStore = valueStore;
             this.DigitalCookieUrl = digitalCookieUrl;
         }
 
+        public readonly ValueStore ValueStore;
         public string DigitalCookieUrl { get; set; }
     }
 }

@@ -8,9 +8,9 @@ namespace CookieMonster.Model
             this.To = to;
         }
 
-        Cookie Currency { get; }
-        decimal Amount { get; }
-        ValueStore From { get; }
-        ValueStore To { get; }
+        public readonly Cookie Currency;
+        public readonly decimal Amount;
+        public readonly ValueStore From;
+        public readonly ValueStore To;
     }
 }

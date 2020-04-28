@@ -2,15 +2,16 @@ using System.Collections.Generic;
 using System;
 
 namespace CookieMonster.Model {
-    public class Booth : ValueStore {
-        public Booth(ulong id, string name, string location, string notes, DateTime shiftTime, List<Scout> scouts)
-          : base(ValueStoreType.Booth, id, name) {
+    public class Booth {
+        public Booth(ValueStore valueStore, string location, string notes, DateTime shiftTime, List<Scout> scouts) {
+            this.ValueStore = valueStore;
             this.Location = location;
             this.Notes = notes;
             this.ShiftTime = shiftTime;
-            this.Scouts = scouts;
+            this.Scouts = new List<Scout>(scouts);
         }
 
+        public readonly ValueStore ValueStore;
         public string Location { get; set; }
         public string Notes { get; set; }
         public DateTime ShiftTime { get; set; }

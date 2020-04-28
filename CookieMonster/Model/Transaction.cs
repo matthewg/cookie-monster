@@ -1,28 +1,27 @@
-using System.Collections.Generic;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace CookieMonster.Model
 {
-    public class Transaction {
+    public struct Transaction {
         public Transaction(ulong id,
                                  DateTime time,
                                  List<TransactionItem> items,
                                  string note,
-                                 MoneyType moneyType,
-                                 Transaction? linkedTransaction) {
+                                 MoneyType moneyType) {
             this.Id = id;
             this.Time = time;
-            this.Items = items;
+            this.Items = new List<TransactionItem>(items).AsReadOnly();
             this.Note = note;
             this.MoneyType = moneyType;
-            this.LinkedTransaction = linkedTransaction;
         }
 
-        ulong Id { get; }
-        DateTime Time { get; }
-        List<TransactionItem> Items { get; set; }
-        string Note { get; set; }
-        MoneyType MoneyType { get; }
-        Transaction? LinkedTransaction { get; set; }
+        public readonly ulong Id;
+        public readonly DateTime Time;
+        public readonly ReadOnlyCollection<TransactionItem> Items;
+        public readonly string Note;
+        public readonly MoneyType MoneyType;
     }
 }

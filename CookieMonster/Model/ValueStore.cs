@@ -1,14 +1,16 @@
+using System;
+
 namespace CookieMonster.Model
 {
-    public class ValueStore {
+    public struct ValueStore {
         public ValueStore(ValueStoreType valueStoreType, ulong id, string name) {
             this.ValueStoreType = valueStoreType;
             this.Id = id;
             this.Name = name;
         }
 
-        public ValueStoreType ValueStoreType { get; }
-        public ulong Id { get; }
-        public string Name { get; }
+        public readonly ValueStoreType ValueStoreType;
+        public readonly ulong Id;
+        public readonly string Name;
     }
 }
