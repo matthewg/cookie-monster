@@ -50,8 +50,35 @@ Girl Scout Cookie accounting
   * To fulfill:
     * From:Scout to:Customer Tagalongs 5 boxes
     * From:Customer to:Scout USD 25.00
-
-* Sale (online direct ship, online pre-order, booth, in-person pre-order, in-person wagon)
-* Delivery (fulfill pre-order)
+* Online direct ship
+  * At time of order:
+    * From:Customer to:DigitalCookie Tagalongs -5 boxes
+    * From:Customer to:DigitalCookie USD 25.00
+    * From:DigitalCookie to:Customer USD -25.00
+    * From:Scout to:DigitalCookie USD -25.00
+  * When DigitalCookie payment is processed:
+    * From:DigitalCookie to:Scout USD 25.00
+  * When DigitalCookie ships:
+    * From:DigitalCookie to:Customer Tagalongs 5 boxes
+* Online in-person delivery
+  * At time of order:
+    * From:Customer to:Scout Tagalongs -5 boxes
+    * From:Customer to:DigitalCookie USD 25.00
+    * From:DigitalCookie to:Customer USD -25.00
+    * From:Scout to:DigitalCookie USD -25.00
+  * When DigitalCookie payment is processed:
+    * From:DigitalCookie to:Scout USD 25.00
+  * To fulfill:
+    * From:Scout to:Customer Tagalongs 5 boxes
+* Booth purchase
+  * From:Customer to:Booth Tagalongs -5 boxes
+  * From:Customer to:Booth USD 25.00
+  * From:Booth to:Customer USD -25.00
+  * From:Booth to:Customer Tagalongs 5 boxes
+* Wagon sale
+  * From:Customer to:Scout Tagalongs -5 boxes
+  * From:Customer to:Scout USD 25.00
+  * From:Scout to:Customer USD -25.00
+  * From:Scout to:Customer Tagalongs 5 boxes
 * Booth shift management (create booth, assign both, view upcoming booths)
 * Reporting (inventory, scout earnings reports)
