@@ -11,10 +11,13 @@ namespace CookieMonster.Ledger {
 
         public void Add(Cookie currency, decimal amount) {
             if (currency.Equals(Cookie.CASH) && (Math.Abs(amount % 1) > 0)) {
-                throw new ArgumentException("Must transact integer number of non-cash currency");
+                throw new ArgumentException($"Must transact integer amount of non-cash currency; tried to do {amount} of {currency.Name}");
             }
 
             _amounts[currency] = this.Get(currency) + amount;
+            if (_amounts[currency] == 0.00M) {
+                _amounts.Remove(currency);
+            }
         }
 
         public void Subtract(Cookie currency, decimal amount) {
