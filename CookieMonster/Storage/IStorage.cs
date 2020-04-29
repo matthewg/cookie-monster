@@ -17,11 +17,11 @@ namespace CookieMonster.Storage {
         void DeleteTransaction(Transaction transaction);
         void DeleteValueStore(ValueStore valueStore);
 
-        void PutBooth(Booth booth);
-        void PutCookie(Cookie cookie);
-        void PutCustomer(Customer customer);
-        void PutScout(Scout scout);
-        void PutTransaction(Transaction transaction);
-        void PutValueStore(ValueStore valueStore);
+        Booth PutBooth(Booth booth);
+        Cookie PutCookie(Cookie cookie);
+        Customer PutCustomer(Customer customer);
+        Scout PutScout(Scout scout);
+        Transaction PutTransaction(Transaction transaction);
+        ValueStore PutValueStore(ValueStore valueStore);
     }
 }

@@ -51,23 +51,38 @@ namespace CookieMonster.Storage {
             _valueStores.Remove(valueStore);
         }
 
-        public void PutBooth(Booth booth) {
+        public Booth PutBooth(Booth booth) {
             _booths.Add(new Booth(booth.ValueStore, booth.Location, booth.Notes, booth.ShiftTime, booth.Scouts));
+            return Booth;
         }
-        public void PutCookie(Cookie cookie) {
+        public Cookie PutCookie(Cookie cookie) {
+            if (cookie.Id == 0) {
+                cookie = new Cookie(_cookies.Count, cookie.Name, cookie.BoxesPerCase, cookie.PricePerBox);
+            }
             _cookies.Add(cookie);
+            return cookie;
         }
-        public void PutCustomer(Customer customer) {
+        public Customer PutCustomer(Customer customer) {
             _customers.Add(new Customer(customer.ValueStore, customer.Address, customer.PhoneNumber, customer.Email, customer.Notes));
+            return customer;
         }
-        public void PutScout(Scout scout) {
+        public Scout PutScout(Scout scout) {
             _scouts.Add(new Scout(scout.ValueStore, scout.DigitalCookieUrl));
+            return scout;
         }
-        public void PutTransaction(Transaction transaction) {
+        public Transaction PutTransaction(Transaction transaction) {
+            if (transaction.Id == 0) {
+                transaction = new Transaction(_transactions.Count, transaction.Time, transaction.Items, transaction.Note, transaction.MoneyType);
+            }
             _transactions.Add(transaction);
+            return transaction;
         }
         public void PutValueStore(ValueStore valueStore) {
+            if (valueStore.Id == 0) {
+                valueStore = new ValueStore(valueStore.ValueStoreType, _valueStores.Count, valueStore.Name);
+            }
             _valueStores.Add(valueStore);
+            return valueStore;
         }
 
         private class BoothDictionary : KeyedCollection<ulong, Booth> {

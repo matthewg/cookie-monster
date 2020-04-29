@@ -1,11 +1,14 @@
 namespace CookieMonster.Model
 {
     public enum ValueStoreType {
-        BankAccount,
-        Scout,
-        Pantry,
         Booth,
-        DigitalCookie,
+        Council,
         Customer,
+        DigitalCookie,
+        Scout,
+        ServiceUnit,
+        Troop,
+        TroopSecondaryPantry,
+        Void,
     }
 }
