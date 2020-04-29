@@ -12,8 +12,6 @@ namespace CookieMonster.Model {
         public readonly int BoxesPerCase;
         public readonly decimal PricePerBox;
 
-        public static Cookie CASH {
-            get => new Cookie(0, "USD", 1, 1.0M);
-        }
+        public static readonly Cookie CASH = new Cookie(0, "USD", 1, 1.0M); 
     }
 }

@@ -1,5 +1,6 @@
 using CookieMonster.Model;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace CookieMonster.Storage {
@@ -28,6 +29,17 @@ namespace CookieMonster.Storage {
         public ReadOnlyCollection<Transaction> Transactions() {
             return new ReadOnlyCollection<Transaction>(_transactions);
         }
+        public ReadOnlyCollection<TransactionItem> TransactionItems(ValueStore valueStore) {
+            var itemsForStore = new List<TransactionItem>();
+            foreach (var transaction in _transactions) {
+                foreach (var item in transaction.Items) {
+                    if (item.From.Equals(valueStore) || item.To.Equals(valueStore)) {
+                        itemsForStore.Add(item);
+                    }
+                }
+            }
+            return itemsForStore.AsReadOnly();
+        }
         public ReadOnlyCollection<ValueStore> ValueStores() {
             return new ReadOnlyCollection<ValueStore>(_valueStores);
         }
@@ -53,11 +65,11 @@ namespace CookieMonster.Storage {
 
         public Booth PutBooth(Booth booth) {
             _booths.Add(new Booth(booth.ValueStore, booth.Location, booth.Notes, booth.ShiftTime, booth.Scouts));
-            return Booth;
+            return booth;
         }
         public Cookie PutCookie(Cookie cookie) {
             if (cookie.Id == 0) {
-                cookie = new Cookie(_cookies.Count, cookie.Name, cookie.BoxesPerCase, cookie.PricePerBox);
+                cookie = new Cookie((ulong)_cookies.Count, cookie.Name, cookie.BoxesPerCase, cookie.PricePerBox);
             }
             _cookies.Add(cookie);
             return cookie;
@@ -72,14 +84,14 @@ namespace CookieMonster.Storage {
         }
         public Transaction PutTransaction(Transaction transaction) {
             if (transaction.Id == 0) {
-                transaction = new Transaction(_transactions.Count, transaction.Time, transaction.Items, transaction.Note, transaction.MoneyType);
+                transaction = new Transaction((ulong)_transactions.Count, transaction.Time, new List<TransactionItem>(transaction.Items), transaction.Note);
             }
             _transactions.Add(transaction);
             return transaction;
         }
-        public void PutValueStore(ValueStore valueStore) {
+        public ValueStore PutValueStore(ValueStore valueStore) {
             if (valueStore.Id == 0) {
-                valueStore = new ValueStore(valueStore.ValueStoreType, _valueStores.Count, valueStore.Name);
+                valueStore = new ValueStore(valueStore.ValueStoreType, (ulong)_valueStores.Count, valueStore.Name);
             }
             _valueStores.Add(valueStore);
             return valueStore;

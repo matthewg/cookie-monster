@@ -2,12 +2,13 @@ using CookieMonster.Model;
 using System.Collections.ObjectModel;
 
 namespace CookieMonster.Storage {
-    interface IStorage {
+    public interface IStorage {
         ReadOnlyCollection<Booth> Booths();
         ReadOnlyCollection<Cookie> Cookies();
         ReadOnlyCollection<Customer> Customers();
         ReadOnlyCollection<Scout> Scouts();
         ReadOnlyCollection<Transaction> Transactions();
+        ReadOnlyCollection<TransactionItem> TransactionItems(ValueStore valueStore);
         ReadOnlyCollection<ValueStore> ValueStores();
 
         void DeleteBooth(Booth booth);

@@ -1,7 +1,15 @@
 using CookieMonster.Model;
 using CookieMonster.Storage;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+
+// Negative amounts are liabilities
+// Positive amounts are tranfers of real assets
+// So, from:X to:Y amt:ABC-10 indicates that Y owes X 10 of ABC
+// When Y actually gives the ABC10 to X, that's recorded as from:Y to:X amt:ABC+10
+
+using Amounts = System.Collections.Generic.Dictionary<CookieMonster.Model.Cookie, decimal>;
 
 namespace CookieMonster.Ledger {
 
@@ -23,38 +31,38 @@ namespace CookieMonster.Ledger {
             bool foundTroop = false;
             bool foundVoid = false;
             foreach (var valueStore in valueStores) {
-                switch (valueStores.ValueStoreType) {
+                switch (valueStore.ValueStoreType) {
                     case ValueStoreType.Council:
                       if (foundCouncil) {
-                          throw new RuntimeException("Duplicate Council");
+                          throw new ArgumentException("Duplicate Council");
                       }
                       foundCouncil = true;
                       this._council = valueStore;
                       break;
                     case ValueStoreType.DigitalCookie:
                       if (foundDigitalCookie) {
-                          throw new RuntimeException("Duplicate Digital Cookie");
+                          throw new ArgumentException("Duplicate Digital Cookie");
                       }
                       foundDigitalCookie = true;
                       this._digitalCookie = valueStore;
                       break;
                     case ValueStoreType.ServiceUnit:
                       if (foundServiceUnit) {
-                          throw new RuntimeException("Duplicate Service Unit");
+                          throw new ArgumentException("Duplicate Service Unit");
                       }
                       foundServiceUnit = true;
                       this._serviceUnit = valueStore;
                       break;
                     case ValueStoreType.Troop:
                       if (foundTroop) {
-                          throw new RuntimeException("Duplicate Troop");
+                          throw new ArgumentException("Duplicate Troop");
                       }
                       foundTroop = true;
                       this._troop = valueStore;
                       break;
                     case ValueStoreType.Void:
                       if (foundVoid) {
-                          throw new RuntimeException("Duplicate Void");
+                          throw new ArgumentException("Duplicate Void");
                       }
                       foundVoid = true;
                       this._void = valueStore;
@@ -64,7 +72,7 @@ namespace CookieMonster.Ledger {
                 }
             }
             if (!foundCouncil || !foundDigitalCookie || !foundServiceUnit || !foundTroop || !foundVoid) {
-                throw new RuntimeException("Missing value stores");
+                throw new ArgumentException("Missing value stores");
             }
         }
 
@@ -76,22 +84,22 @@ namespace CookieMonster.Ledger {
             this._storage.PutValueStore(new ValueStore(ValueStoreType.Void, 0, "Void"));
         }
 
-        public void OrderFromServiceUnitPantry(Dictionary<Cookie, int> order, string note) {
+        public void OrderFromServiceUnitPantry(Amounts order, string note) {
             this.validateServiceUnitOrder(order);
 
             var transactionItems = new List<TransactionItem>();
             // SU pantry owes troop some cookies.
             foreach (var cookieAmount in order) {
-                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value * -1, this._serviceUnit, this._troop);
+                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value * -1, this._troop, this._serviceUnit));
             }
             _storage.PutTransaction(new Transaction(0, DateTime.Now, transactionItems, note + " (ordered from pantry)"));
         }
 
-        public void CancelServiceUnitPantryOrder(Dictionary<Cookie, int> order, string note) {
+        public void CancelServiceUnitPantryOrder(Amounts order, string note) {
             this.validateServiceUnitOrder(order);
-            Dictionary<Cookie, int> outstandingPantryCookies = this.outstandingServiceUnitPantryCookies();
+            Amounts outstandingPantryCookies = this.OutstandingBalance(this._serviceUnit);
             foreach (var cookieOrder in order) {
-                if (cookieOrder.Value > outstandingPantryCookies.TryGetValue(cookieOrder.Key)) {
+                if (cookieOrder.Value > outstandingPantryCookies.Get(cookieOrder.Key)) {
                     throw new InvalidTransaction($"{cookieOrder.Value} of {cookieOrder.Key.Name} is more than has been requested from SU pantry");
                 }
             }
@@ -100,40 +108,41 @@ namespace CookieMonster.Ledger {
             // We no longer want cookies, or pantry can't provide them.
             foreach (var cookieAmount in order) {
                 // Cancel out the pantry's cookie liability and then void out the cookies.
-                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._serviceUnit, this._troop);
-                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._troop, this._void);
+                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._serviceUnit, this._troop));
+                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._troop, this._void));
             }
             _storage.PutTransaction(new Transaction(0, DateTime.Now, transactionItems, note + " (voided pantry order)"));
         }
 
-        public void PickUpServiceUnitPantryOrder(Dictionary<Cookie, int> order) {
+        public void PickUpServiceUnitPantryOrder(Amounts order, string note) {
             this.validateServiceUnitOrder(order);
-            Dictionary<Cookie, int> outstandingPantryCookies = this.outstandingServiceUnitPantryCookies();
-            foreach (var cookieOrder in order) {
-                if (cookieOrder.Value > outstandingPantryCookies.TryGetValue(cookieOrder.Key)) {
-                    throw new InvalidTransaction($"{cookieOrder.Value} of {cookieOrder.Key.Name} is more than has been requested from SU pantry");
-                }
-            }
+            Amounts outstandingPantryCookies = this.OutstandingBalance(this._serviceUnit);
 
             var transactionItems = new List<TransactionItem>();
             foreach (var cookieAmount in order) {
+                if (cookieAmount.Value > outstandingPantryCookies.Get(cookieAmount.Key)) {
+                    // We picked up more than we originally asked for.
+                    // Add a "troop needs cookies from pantry" item so the books balance.
+                    transactionItems.Add(new TransactionItem(cookieAmount.Key, -cookieAmount.Value, this._troop, this._serviceUnit));
+                }
                 // Troop gets the cookies and owes money to council.
-                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._serviceUnit, this._troop);
-                transactionItems.Add(new TransactionItem(Cookie.CASH, cookieAmount.Key.PricePerBox * cookieAmount.Value, this._troop, this._council);
+                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._serviceUnit, this._troop));
+                transactionItems.Add(new TransactionItem(Cookie.CASH, cookieAmount.Key.PricePerBox * cookieAmount.Value * -1, this._council, this._troop));
             }
             _storage.PutTransaction(new Transaction(0, DateTime.Now, transactionItems, note + " (picked up pantry order)"));
         }
 
-        public void ReturnToServiceUnitPantry(Dictionary<Cookie, int> order) {
+        public void ReturnToServiceUnitPantry(Amounts order, string note) {
             this.validateServiceUnitOrder(order);
 
             var transactionItems = new List<TransactionItem>();
             foreach (var cookieAmount in order) {
                 // Troop gives up the cookies and no longer owes money to council.
-                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._troop, this._serviceUnit);
-                transactionItems.Add(new TransactionItem(Cookie.CASH, cookieAmount.Key.PricePerBox * cookieAmount.Value * -1, this._troop, this._council);
+                transactionItems.Add(new TransactionItem(cookieAmount.Key, cookieAmount.Value, this._troop, this._serviceUnit));
+                transactionItems.Add(new TransactionItem(Cookie.CASH, cookieAmount.Key.PricePerBox * cookieAmount.Value, this._troop, this._council));
+                transactionItems.Add(new TransactionItem(Cookie.CASH, cookieAmount.Key.PricePerBox * cookieAmount.Value, this._council, this._void));
             }
-            _storage.PutTransaction(new Transaction(0, DateTime.Now, transactionItems, note + " (picked up pantry order)"));
+            _storage.PutTransaction(new Transaction(0, DateTime.Now, transactionItems, note + " (returned cookies to pantry)"));
         }
 
         public void TransferInventoryWithinTroop(ValueStore from, ValueStore to, Dictionary<Cookie, int> assets) {
@@ -151,31 +160,23 @@ namespace CookieMonster.Ledger {
 
         public void SellDigitalCookie() {}
 
-        public List<Transaction> UnfulfilledTransactions(ValueStore valueStore) {}
-
-        public List<MonetaryValue> OutstandingBalance(ValueStore valueStore) {}
-
-        public List<MonetaryValue> OutstandingInventory(ValueStore valueStore) {}
-
-        private Dictionary<Cookie, int> outstandingServiceUnitPantryCookies() {
-            List<Transaction> outstandingTransactions = UnfulfilledTransactions(this._serviceUnit);
-            var outstandingCookies = new Dictionary<Cookie, int>();
-            foreach (var transaction in outstandingTransactions) {
-                foreach (var item in transaction.Items) {
-                    if (item.Currency == Cookie.CASH) {
-                        continue;
-                    }
-                    outstandingCookies[item.Currency] = outstandingCookies.TryGetValue(item.Currency) + item.Amount*-1;
+        public Amounts OutstandingBalance(ValueStore valueStore) {
+            var amounts = new Amounts();
+            foreach (var item in _storage.TransactionItems(valueStore)) {
+                if (item.To.Equals(valueStore)) {
+                    amounts.Add(item.Currency, item.Amount);
+                } else {
+                    amounts.Subtract(item.Currency, item.Amount);
                 }
             }
-            return outstandingCookies;
+            return amounts;
         }
 
-        private void validateServiceUnitOrder(Dictionary<Cookie, int> order) {
-            if (order.ContainsKey(Cookie.CASH)) {
+        private void validateServiceUnitOrder(Amounts order) {
+            if (order.Get(Cookie.CASH) != 0.0M) {
                 throw new InvalidTransaction("Can't request cash from SU pantry");
             }
-            foreach (KeyValuePair<Cookie, int> cookieAmount in order) {
+            foreach (var cookieAmount in order) {
                 if (cookieAmount.Value <= 0) {
                     throw new InvalidTransaction($"When ordering {cookieAmount.Key.Name}, you must order at least 1 box.");
                 }
